@@ -1,0 +1,28 @@
+{
+    "theme_color": "#fef2a4",
+    "background_color": "#242728",
+    "icons": [
+        {
+            "purpose": "maskable",
+            "sizes": "512x512",
+            "src": "icon512_maskable.png",
+            "type": "image/png"
+        },
+        {
+            "purpose": "any",
+            "sizes": "512x512",
+            "src": "icon512_rounded.png",
+            "type": "image/png"
+        }
+    ],
+    "orientation": "portrait",
+    "display": "standalone",
+    "dir": "auto",
+    "lang": "en-US",
+    "name": "Child Card Game",
+    "short_name": "CCG",
+    "start_url": "https://child-adventure.netlify.app/",
+    "scope": "https://child-adventure.netlify.app/",
+    "description": "Yay! love love🌟",
+    "id": "https://child-adventure.netlify.app/"
+}
