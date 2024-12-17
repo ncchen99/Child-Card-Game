@@ -414,6 +414,11 @@ window.addEventListener('beforeinstallprompt', (e) => {
     deferredPrompt = e;
     // Show the install button
     installPrompt.classList.add('show');
+
+    // Hide the prompt after 5 seconds
+    setTimeout(() => {
+        installPrompt.classList.remove('show');
+    }, 5000);
 });
 
 installButton.addEventListener('click', async () => {
