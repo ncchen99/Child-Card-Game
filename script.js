@@ -320,6 +320,7 @@ function showFullscreen(card) {
                     color: #fff;
                     font-family: "Press Start 2P", cursive;
                     font-size: 12px;
+                    opacity: 0.8;
                 }
                 .error-message {
                     color: #ff6b6b;
@@ -327,14 +328,52 @@ function showFullscreen(card) {
                     font-size: 14px;
                     text-align: center;
                     padding: 20px;
+                    background: rgba(0, 0, 0, 0.8);
+                    border: 4px solid #ff6b6b;
+                    border-radius: 8px;
+                    max-width: 80%;
+                    margin: 20px;
+                }
+                .offline-indicator {
+                    position: fixed;
+                    top: 20px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: #ffd700;
+                    color: #000;
+                    padding: 8px 16px;
+                    border-radius: 4px;
+                    font-family: "Press Start 2P", cursive;
+                    font-size: 10px;
+                    opacity: 0;
+                    transition: opacity 0.3s ease;
+                }
+                .offline-indicator.show {
+                    opacity: 1;
                 }
             </style>
         </head>
         <body>
+            <div id="offline-indicator" class="offline-indicator">OFFLINE MODE</div>
             <img src="${card}" 
-                onerror="this.style.display='none'; document.body.innerHTML += '<div class=\\'error-message\\'>Failed to load image</div>'"
+                onerror="this.style.display='none'; document.body.innerHTML += '<div class=\\'error-message\\'>Failed to load image<br>Please check your connection</div>'"
                 onclick="window.close()">
             <div class="close-hint">Tap anywhere to close</div>
+            <script>
+                // Check offline status
+                function updateOfflineStatus() {
+                    const indicator = document.getElementById('offline-indicator');
+                    if (!navigator.onLine) {
+                        indicator.classList.add('show');
+                    } else {
+                        indicator.classList.remove('show');
+                    }
+                }
+                
+                window.addEventListener('online', updateOfflineStatus);
+                window.addEventListener('offline', updateOfflineStatus);
+                updateOfflineStatus(); // Initial check
+            </script>
         </body>
         </html>
     `);

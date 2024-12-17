@@ -72,7 +72,16 @@
         });
 
         window.addEventListener('offline', function () {
-            document.getElementById('offline-notification').style.display = 'block';
+            const notification = document.getElementById('offline-notification');
+            notification.style.display = 'block';
+            // 3秒後自動隱藏通知
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                    notification.style.opacity = '1';
+                }, 500);
+            }, 3000);
         });
 
         // 檢查是否支援 Service Worker

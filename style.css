@@ -111,7 +111,7 @@ h1 {
     border: 4px solid #444;
     background-color: #333;
     padding: 10px;
-    margin: 10px;
+    margin: 10px 10px 10px 0;
     image-rendering: pixelated;
     transition: all 0.3s ease;
     opacity: 1;
@@ -336,7 +336,7 @@ h1 {
     }
 
     .img-thumbnail {
-        margin: 5px;
+        margin: 5px 5px 5px 0;
         padding: 5px;
     }
 
@@ -360,7 +360,7 @@ h1 {
     }
 
     .img-thumbnail {
-        margin: 3px;
+        margin: 3px 3px 3px 0;
         padding: 3px;
     }
 
@@ -470,7 +470,7 @@ h1 {
     }
 
     .img-thumbnail {
-        margin: 5px;
+        margin: 5px 5px 5px 0;
         padding: 5px;
     }
 
@@ -500,7 +500,7 @@ h1 {
     }
 
     .img-thumbnail {
-        margin: 3px;
+        margin: 3px 3px 3px 0;
         padding: 3px;
     }
 }
