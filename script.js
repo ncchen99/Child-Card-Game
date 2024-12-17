@@ -401,3 +401,41 @@ document.getElementById('hidden-reset-btn').addEventListener('click', () => {
         location.reload();
     }
 });
+
+// PWA installation handling
+let deferredPrompt;
+const installPrompt = document.getElementById('install-prompt');
+const installButton = document.getElementById('install-button');
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    // Prevent Chrome 67 and earlier from automatically showing the prompt
+    e.preventDefault();
+    // Stash the event so it can be triggered later
+    deferredPrompt = e;
+    // Show the install button
+    installPrompt.classList.add('show');
+});
+
+installButton.addEventListener('click', async () => {
+    // Hide the prompt
+    installPrompt.classList.remove('show');
+    // Show the install prompt
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
+        // Wait for the user to respond to the prompt
+        const { outcome } = await deferredPrompt.userChoice;
+        // Clear the deferredPrompt variable
+        deferredPrompt = null;
+    }
+});
+
+// Hide the install prompt if the PWA is already installed
+window.addEventListener('appinstalled', () => {
+    installPrompt.classList.remove('show');
+    deferredPrompt = null;
+});
+
+// Check if the app is running in standalone mode (already installed)
+if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+    installPrompt.style.display = 'none';
+}

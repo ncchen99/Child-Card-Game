@@ -10,8 +10,10 @@
     <link rel="stylesheet" href="style.css">
     <meta name="theme-color" content="#000000">
     <link rel="manifest" href="manifest.json">
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="images/icon512_rounded.png">
     <!-- iOS support -->
-    <link rel="apple-touch-icon" href="images/icon-192x192.png">
+    <link rel="apple-touch-icon" href="images/icon512_rounded.png">
     <meta name="apple-mobile-web-app-status-bar" content="#000000">
 </head>
 
@@ -20,6 +22,12 @@
     <div id="offline-notification" class="alert alert-warning" role="alert"
         style="display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 9999; text-align: center;">
         You are currently offline. The app will continue to work with cached content.
+    </div>
+
+    <!-- Install prompt -->
+    <div id="install-prompt" class="install-prompt">
+        Install app for the best experience!
+        <button id="install-button" class="install-button">Install</button>
     </div>
 
     <!-- Navigation -->
