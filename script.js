@@ -1,6 +1,6 @@
 // Card data for each level
 const allCards = [
-    { level: 1, cards: ["./images/card1-1.webp", "./images/card1-2.webp"], name: "Rainbow Forest" },
+    { level: 1, cards: ["./images/card1-1.jpg", "./images/card1-2.jpg"], name: "Rainbow Forest" },
     { level: 2, cards: ["./images/card2-1.jpg", "./images/card2-2.jpg"], name: "Candy Castle" },
     { level: 3, cards: ["./images/card3-1.jpg", "./images/card3-2.jpg"], name: "Magic Garden" },
     { level: 4, cards: ["./images/card4-1.jpg", "./images/card4-2.jpg"], name: "Star Island" },
@@ -63,10 +63,46 @@ async function initializeServiceWorker() {
         try {
             const registration = await navigator.serviceWorker.register('service-worker.js');
             console.log('ServiceWorker registration successful');
+
+            // 監聽來自 Service Worker 的消息
+            navigator.serviceWorker.addEventListener('message', event => {
+                if (event.data.type === 'NEW_VERSION') {
+                    showUpdateNotification();
+                }
+            });
+
+            // 檢查更新
+            registration.addEventListener('updatefound', () => {
+                const newWorker = registration.installing;
+                newWorker.addEventListener('statechange', () => {
+                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                        showUpdateNotification();
+                    }
+                });
+            });
         } catch (err) {
             console.log('ServiceWorker registration failed: ', err);
         }
     }
+}
+
+// 顯示更新通知
+function showUpdateNotification() {
+    const toast = document.createElement('div');
+    toast.className = 'pixel-toast update-notification';
+    toast.innerHTML = `
+        <h3>New Version Available!</h3>
+        <p>Refresh to update</p>
+        <button onclick="window.location.reload()" class="install-button">Update Now</button>
+    `;
+    document.body.appendChild(toast);
+
+    // 60秒後自動移除通知
+    setTimeout(() => {
+        if (document.body.contains(toast)) {
+            toast.remove();
+        }
+    }, 60000);
 }
 
 // Update level buttons with proper styling and names
@@ -76,7 +112,7 @@ function updateLevelButtons() {
 
     levelContainer.innerHTML = '';
     allCards.forEach((levelData, index) => {
-        // 檢查這個關卡是否已經選過卡片
+        // 檢查這個關卡是否已經選過卡��
         const hasSelectedCard = levelData.cards.some(card =>
             selectedCards.includes(card)
         );
@@ -253,8 +289,10 @@ function renderOwnedCards() {
         let touchStartTime;
         let touchStartY;
         let isTouchMoved = false;
+        let isTouch = false;
 
         img.addEventListener('touchstart', (e) => {
+            isTouch = true;
             touchStartTime = Date.now();
             touchStartY = e.touches[0].clientY;
             isTouchMoved = false;
@@ -272,14 +310,22 @@ function renderOwnedCards() {
 
             img.style.transform = '';
 
-            // 只有在快速點擊且沒有明顯移動時才觸發
+            // ���有在快速點擊且沒有明顯移動時才觸發
             if (!isTouchMoved && touchDuration < 300 && verticalMove < 10) {
                 showFullscreen(card);
             }
+
+            // 防止觸發 click 事件
+            e.preventDefault();
         });
 
-        // 只添加一個點擊事件處理器
-        img.addEventListener('click', () => showFullscreen(card));
+        // 只在非觸控設備上添加點擊事件
+        img.addEventListener('click', (e) => {
+            if (!isTouch) {
+                showFullscreen(card);
+            }
+            isTouch = false;
+        });
 
         container.appendChild(img);
     });
@@ -407,18 +453,34 @@ let deferredPrompt;
 const installPrompt = document.getElementById('install-prompt');
 const installButton = document.getElementById('install-button');
 
+// 檢測是否為 iOS
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+// 顯示安裝提示
+function showInstallPrompt() {
+    if (isIOS) {
+        // iOS 設備顯示特殊提示
+        installPrompt.innerHTML = `
+            Tap <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAAsTAAALEwEAmpwYAAAA/0lEQVR4nO2UQQ6CMBBFewRIvIwHQDwEnsEjeAFjovEyegA9AO4kLnVBF2QBH5mkaUzaKaUILHiLJvPn/85Mp1Mq5WqZHgHELyKx4Kw8Aoh7IxLvzPXOAZ/vLzgA8YuI7+w6+B8A4YJ4yQHiGxE/2Qj8fEXzKwDxhEjsEoCzjqBFJ8XLAxDfPQKIXTohXjpFxI+fAA7ZU0T88BTALvtxiHjMAogvngDssyfFY1YAYpcB4HyPvHPWEQwQj9kBiO1/AOzWEfSIh+wAxJcMgN06ggHxkB2A+JwBsFtHMCIesgMQnzIAdusIRsRDdgBimwGwW0cwIR6yAxCfMwB26wgmxENhAG9AQkZf3S2nZQAAAABJRU5ErkJggg==" style="height: 1em; vertical-align: middle;"> 
+            then "Add to Home Screen"
+        `;
+        installButton.style.display = 'none';
+    }
+    installPrompt.classList.add('show');
+
+    // 5秒後自動隱藏
+    setTimeout(() => {
+        installPrompt.classList.remove('show');
+    }, 5000);
+}
+
 window.addEventListener('beforeinstallprompt', (e) => {
     // Prevent Chrome 67 and earlier from automatically showing the prompt
     e.preventDefault();
     // Stash the event so it can be triggered later
     deferredPrompt = e;
     // Show the install button
-    installPrompt.classList.add('show');
-
-    // Hide the prompt after 5 seconds
-    setTimeout(() => {
-        installPrompt.classList.remove('show');
-    }, 5000);
+    showInstallPrompt();
 });
 
 installButton.addEventListener('click', async () => {
@@ -443,4 +505,9 @@ window.addEventListener('appinstalled', () => {
 // Check if the app is running in standalone mode (already installed)
 if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
     installPrompt.style.display = 'none';
+} else if (isIOS) {
+    // 如果是 iOS 設備且不是 standalone 模式，顯示安裝提示
+    setTimeout(() => {
+        showInstallPrompt();
+    }, 2000);
 }

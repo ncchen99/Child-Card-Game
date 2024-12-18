@@ -522,6 +522,21 @@ h1 {
     text-align: center;
     border: 4px solid #000;
     animation: promptSlideUp 0.3s ease-out;
+    max-width: 90%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* iOS specific styles */
+@supports (-webkit-touch-callout: none) {
+    .install-prompt {
+        bottom: env(safe-area-inset-bottom, 20px);
+        padding-bottom: max(15px, env(safe-area-inset-bottom, 15px));
+        background-color: rgba(255, 204, 0, 0.95);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
 }
 
 .install-prompt.show {
@@ -574,4 +589,33 @@ h1 {
         margin-left: auto;
         margin-right: auto;
     }
+}
+
+/* Update notification styles */
+.update-notification {
+    background-color: rgba(0, 0, 0, 0.95) !important;
+    border: 4px solid #4CAF50 !important;
+}
+
+.update-notification h3 {
+    color: #4CAF50 !important;
+    margin-bottom: 10px;
+}
+
+.update-notification .install-button {
+    background-color: #4CAF50;
+    color: #fff;
+    margin-top: 10px;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: "Press Start 2P", cursive;
+    font-size: 0.7rem;
+    transition: all 0.2s ease;
+}
+
+.update-notification .install-button:hover {
+    background-color: #45a049;
+    transform: scale(1.05);
 }

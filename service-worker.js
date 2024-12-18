@@ -1,11 +1,11 @@
-const CACHE_NAME = 'card-game-v1';
+const CACHE_NAME = 'card-game-v4';
 const ASSETS_TO_CACHE = [
     '/',
     '/index.html',
     '/style.css',
     '/script.js',
-    '/images/card1-1.webp',
-    '/images/card1-2.webp',
+    '/images/card1-1.jpg',
+    '/images/card1-2.jpg',
     '/images/card2-1.jpg',
     '/images/card2-2.jpg',
     '/images/card3-1.jpg',
@@ -22,6 +22,7 @@ const ASSETS_TO_CACHE = [
 
 // Install event - cache all static assets
 self.addEventListener('install', event => {
+    console.log('[Service Worker] Installing new version');
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then(cache => {
@@ -40,52 +41,56 @@ self.addEventListener('install', event => {
 
 // Activate event - clean up old caches and take control
 self.addEventListener('activate', event => {
+    console.log('[Service Worker] Activating new version');
     event.waitUntil(
         Promise.all([
             caches.keys().then(cacheNames => {
                 return Promise.all(
                     cacheNames.map(cacheName => {
                         if (cacheName !== CACHE_NAME) {
-                            console.log('Deleting old cache:', cacheName);
+                            console.log('[Service Worker] Deleting old cache:', cacheName);
                             return caches.delete(cacheName);
                         }
                     })
                 );
             }),
-            self.clients.claim()
+            self.clients.claim(),
+            self.clients.matchAll().then(clients => {
+                clients.forEach(client => {
+                    client.postMessage({ type: 'NEW_VERSION' });
+                });
+            })
         ])
     );
 });
 
-// Fetch event - 離線優先策略
+// Fetch event - 網路優先策略
 self.addEventListener('fetch', event => {
     event.respondWith(
-        caches.match(event.request)
+        fetch(event.request)
             .then(response => {
-                if (response) {
+                if (!response || response.status !== 200 || response.type !== 'basic') {
                     return response;
                 }
 
-                return fetch(event.request)
-                    .then(response => {
-                        if (!response || response.status !== 200 || response.type !== 'basic') {
-                            return response;
-                        }
-
-                        const responseToCache = response.clone();
-
-                        caches.open(CACHE_NAME)
-                            .then(cache => {
-                                cache.put(event.request, responseToCache);
-                            })
-                            .catch(error => {
-                                console.error('Cache put failed:', error);
-                            });
-
-                        return response;
+                const responseToCache = response.clone();
+                caches.open(CACHE_NAME)
+                    .then(cache => {
+                        cache.put(event.request, responseToCache);
                     })
                     .catch(error => {
-                        console.error('Fetch failed:', error);
+                        console.error('Cache put failed:', error);
+                    });
+
+                return response;
+            })
+            .catch(error => {
+                console.log('Fetch failed, falling back to cache:', error);
+                return caches.match(event.request)
+                    .then(response => {
+                        if (response) {
+                            return response;
+                        }
                         if (event.request.url.match(/\.(jpg|jpeg|png|gif|webp)$/)) {
                             return caches.match('/images/placeholder.webp');
                         }
