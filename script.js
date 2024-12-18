@@ -1,10 +1,10 @@
 // Card data for each level
 const allCards = [
-    { level: 1, cards: ["./images/card1-1.jpg", "./images/card1-2.jpg"], name: "Rainbow Forest" },
-    { level: 2, cards: ["./images/card2-1.jpg", "./images/card2-2.jpg"], name: "Candy Castle" },
-    { level: 3, cards: ["./images/card3-1.jpg", "./images/card3-2.jpg"], name: "Magic Garden" },
-    { level: 4, cards: ["./images/card4-1.jpg", "./images/card4-2.jpg"], name: "Star Island" },
-    { level: 5, cards: ["./images/card5-1.jpg", "./images/card5-2.jpg"], name: "Dragon Peak" }
+    { level: 1, cards: ["./images/card1-1.jpg", "./images/card1-2.jpg"], name: "Temple Square" },
+    { level: 2, cards: ["./images/card2-1.jpg", "./images/card2-2.jpg"], name: "Dojo Plaza" },
+    { level: 3, cards: ["./images/card3-1.jpg", "./images/card3-2.jpg"], name: "Dojo Hall" },
+    { level: 4, cards: ["./images/card4-1.jpg", "./images/card4-2.jpg"], name: "Carport Garden" },
+    { level: 5, cards: ["./images/card5-1.jpg", "./images/card5-2.jpg"], name: "Carport Corner" }
 ];
 
 // Cache selected cards
@@ -112,7 +112,7 @@ function updateLevelButtons() {
 
     levelContainer.innerHTML = '';
     allCards.forEach((levelData, index) => {
-        // 檢查這個關卡是否已經選過卡��
+        // 檢查這個關卡是否已經選過卡片
         const hasSelectedCard = levelData.cards.some(card =>
             selectedCards.includes(card)
         );
@@ -122,8 +122,8 @@ function updateLevelButtons() {
             const button = document.createElement('button');
             button.className = 'level-btn btn';
             button.dataset.level = levelData.level;
-            button.textContent = `Level ${levelData.level}: ${levelData.name}`;
-            button.setAttribute('aria-label', `Play Level ${levelData.level}: ${levelData.name}`);
+            button.textContent = `${levelData.name}`;
+            button.setAttribute('aria-label', `Play ${levelData.name}`);
             button.addEventListener('click', () => openLevel(levelData.level));
 
             // Add animation class with delay
@@ -310,7 +310,7 @@ function renderOwnedCards() {
 
             img.style.transform = '';
 
-            // ���有在快速點擊且沒有明顯移動時才觸發
+            // 有在快速點擊且沒有明顯移動時才觸發
             if (!isTouchMoved && touchDuration < 300 && verticalMove < 10) {
                 showFullscreen(card);
             }
